@@ -14,10 +14,12 @@ exports.handler = async function (context, event, callback) {
       return callback(new Error("Invalid token"));
     }
     console.log("response", event);
+    
+    // Default to rfa_agent for WordPress integration
     const assistantIdentity =
       typeof event._assistantIdentity === "string"
         ? event._assistantIdentity
-        : undefined;
+        : "rfa_agent";
 
     if (event.Status === "Failed") {
       console.error(event);
@@ -27,11 +29,25 @@ exports.handler = async function (context, event, callback) {
     }
 
     const client = context.getTwilioClient();
-
-    const [serviceSid, conversationsSid] = event.SessionId.replace(
-      "webhook:conversations__",
-      ""
-    ).split("/");
+    
+    // Parse session ID correctly - it could come in different formats
+    let serviceSid, conversationsSid;
+    
+    if (event.SessionId.includes("conversations__")) {
+      [serviceSid, conversationsSid] = event.SessionId.replace(
+        "conversations__",
+        ""
+      ).split("/");
+    } else if (event.SessionId.includes("webhook:conversations__")) {
+      [serviceSid, conversationsSid] = event.SessionId.replace(
+        "webhook:conversations__",
+        ""
+      ).split("/");
+    } else {
+      console.error("Invalid session ID format:", event.SessionId);
+      return callback(new Error("Invalid session ID format"));
+    }
+    
     const body = event.Body;
 
     const attributes = await readConversationAttributes(
@@ -46,6 +62,8 @@ exports.handler = async function (context, event, callback) {
         attributes: JSON.stringify({ ...attributes, assistantIsTyping: false }),
       });
 
+    console.log(`Sending message as ${assistantIdentity} to conversation ${conversationsSid}`);
+    
     const message = await client.conversations.v1
       .services(serviceSid)
       .conversations(conversationsSid)
@@ -54,7 +72,7 @@ exports.handler = async function (context, event, callback) {
         author: assistantIdentity,
       });
 
-    console.log(`conversation message sent ${message.sid}`);
+    console.log(`Conversation message sent ${message.sid}`);
 
     return callback(null, {});
   } catch (err) {

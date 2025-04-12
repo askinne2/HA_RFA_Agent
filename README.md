@@ -4,14 +4,14 @@ A bilingual, AI-powered SMS assistant designed to support the Hispanic Alliance 
 
 ## 📝 Project Overview
 
-This project aims to develop a text-based AI assistant that interacts with community members via SMS to:
+This project is a Twilio Serverless application that provides an AI-powered SMS assistant to:
 - Understand inquiries related to housing, education, healthcare, and more
 - Provide relevant information and resources from a curated knowledge base
 - Escalate complex or unclear requests to human agents when necessary
 
-By leveraging Twilio for SMS integration and OpenAI's language models for natural language processing, the assistant seeks to enhance accessibility and responsiveness for community support services.
+By leveraging Twilio Serverless Functions and OpenAI's language models through LangChain, the assistant enhances accessibility and responsiveness for community support services.
 
-## 📂 Table of Contents
+## �� Table of Contents
 	•	Features
 	•	Tech Stack
 	•	Getting Started
@@ -27,22 +27,20 @@ By leveraging Twilio for SMS integration and OpenAI's language models for natura
 - **Intent Recognition**: Identifies user needs such as housing assistance or ESL classes
 - **Resource Matching**: Retrieves information from a structured knowledge base
 - **Fallback Mechanism**: Routes complex queries to human agents when required
-- **Local Development**: Configured for local testing and development with ngrok
+- **Serverless Architecture**: Deployed on Twilio's serverless infrastructure
 
 ## 🛠 Tech Stack
 
-- **Programming Language**: Python 3.10+
-- **Frameworks**: FastAPI, LangChain
-- **AI Models**: OpenAI GPT-4
-- **Vector Store**: Pinecone (or alternative)
-- **SMS Integration**: Twilio Programmable Messaging
-- **Environment Management**: Python-dotenv
-- **Development Tools**: Cursor (AI-enhanced IDE), ngrok
+- **Runtime**: Node.js 18+
+- **Language**: TypeScript
+- **AI Integration**: LangChain with OpenAI GPT-4
+- **SMS Integration**: Twilio Serverless Functions
+- **Development Tools**: Cursor (AI-enhanced IDE), ngrok for local testing
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.10 or higher
+- Node.js 18 or higher
 - Twilio Account with a verified phone number
 - OpenAI API Key
 - ngrok for local webhook testing
@@ -55,18 +53,12 @@ By leveraging Twilio for SMS integration and OpenAI's language models for natura
    cd ha-request-line-assistant
    ```
 
-2. **Create and Activate Virtual Environment**
+2. **Install Dependencies**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   npm install
    ```
 
-3. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure Environment Variables**
+3. **Configure Environment Variables**
    Create a `.env` file in the root directory and add your credentials:
    ```
    OPENAI_API_KEY=your_openai_api_key
@@ -75,14 +67,14 @@ By leveraging Twilio for SMS integration and OpenAI's language models for natura
    TWILIO_PHONE_NUMBER=your_twilio_phone_number
    ```
 
-5. **Run the Application**
+4. **Run the Application Locally**
    ```bash
-   uvicorn app:app --reload
+   npm run dev
    ```
 
-6. **Expose Local Server with ngrok**
+5. **Expose Local Server with ngrok**
    ```bash
-   ngrok http 8000
+   ngrok http 3000
    ```
    Use the generated ngrok URL to set up your Twilio webhook.
 
@@ -93,7 +85,7 @@ Once the application is running and ngrok is set up:
 1. **Configure Twilio Webhook**
    - Log in to your Twilio Console
    - Navigate to your phone number settings
-   - Set the "Messaging" webhook URL to your ngrok URL followed by `/sms` (e.g., `https://your-ngrok-url.ngrok.io/sms`)
+   - Set the "Messaging" webhook URL to your ngrok URL followed by `/channels/messaging/incoming`
 
 2. **Interact via SMS**
    - Send an SMS to your Twilio phone number
@@ -103,11 +95,16 @@ Once the application is running and ngrok is set up:
 
 ```
 ha-request-line-assistant/
-├── app.py                 # Main FastAPI application
-├── utils.py               # Utility functions (e.g., embedding, search)
-├── kb.json                # Knowledge base with categorized resources
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (not committed)
+├── functions/                # Twilio Serverless Functions
+│   ├── channels/            # Channel-specific handlers
+│   │   ├── messaging/      # SMS message handling
+│   │   ├── voice/         # Voice call handling
+│   │   └── conversations/ # Chat handling
+│   └── tools/              # Utility functions
+├── assets/                  # Static assets
+├── package.json            # Node.js dependencies
+├── tsconfig.json           # TypeScript configuration
+├── .env                    # Environment variables
 └── README.md              # Project documentation
 ```
 

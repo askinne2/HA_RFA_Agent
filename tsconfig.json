@@ -1,6 +1,15 @@
 {
   "compilerOptions": {
-    "allowJs": true
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "target": "es2018",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["node_modules/@twilio-labs/serverless-runtime-types/index.d.ts"]
+  "include": [
+    "node_modules/@twilio-labs/serverless-runtime-types/index.d.ts",
+    "functions/**/*.ts"
+  ]
 }
