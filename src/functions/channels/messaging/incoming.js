@@ -10,7 +10,7 @@ const path = require('path');
 const twilio = require('twilio');
 
 // Load the enhanced resource guide
-const resourceGuidePath = path.join(process.cwd(), 'docs/enhanced_resource_guide.json');
+const resourceGuidePath = path.join(process.cwd(), 'data/resources/enhanced_resource_guide.json');
 let resourceGuide;
 try {
   const fileContent = fs.readFileSync(resourceGuidePath, 'utf-8');
