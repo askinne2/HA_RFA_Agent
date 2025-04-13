@@ -1,4 +1,4 @@
-console.log('🔴 USING ORIGINAL VERSION OF incoming.js 🔴');
+console.log('💫 USING SRC VERSION OF incoming.js 💫');
 console.log('📁 Current working directory:', process.cwd());
 console.log('🔄 Current function path:', __filename);
 

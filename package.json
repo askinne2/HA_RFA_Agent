@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "start": "twilio-run",
-    "dev": "twilio-run --override",
-    "deploy": "twilio-run deploy"
+    "start": "twilio-run --config config/.twilioserverlessrc",
+    "dev": "twilio-run --override --config config/.twilioserverlessrc",
+    "dev:verbose": "twilio-run --override --config config/.twilioserverlessrc --log-level debug",
+    "dev:clean": "twilio-run --override --config config/.twilioserverlessrc --detailed-logs",
+    "deploy": "twilio-run deploy --config config/.twilioserverlessrc",
+    "migrate": "bash scripts/migrate_to_new_structure.sh"
   },
   "dependencies": {
     "@langchain/community": "^0.0.32",
@@ -31,12 +34,20 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "transform": {
-      "^.+\\.ts$": ["ts-jest", {
-        "tsconfig": "tsconfig.json"
-      }]
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "tsconfig": "config/tsconfig.json"
+        }
+      ]
     },
-    "testMatch": ["**/*.test.ts"]
+    "testMatch": [
+      "tests/**/*.test.ts"
+    ]
   }
 }

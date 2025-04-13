@@ -1,4 +1,4 @@
-console.log('🔴 USING ORIGINAL VERSION OF messageAdded.protected.js 🔴');
+console.log('💫 USING SRC VERSION OF messageAdded.protected.js 💫');
 console.log('🔧 Utils asset path:', Runtime.getAssets()["/utils.js"].path);
 
 const {
@@ -18,7 +18,7 @@ const path = require('path');
 // Load the enhanced resource guide
 let resourceGuide;
 try {
-  const resourceGuidePath = path.join(process.cwd(), 'docs/enhanced_resource_guide.json');
+  const resourceGuidePath = path.join(process.cwd(), 'data/resources/enhanced_resource_guide.json');
   console.log(`🔍 Attempting to load resource guide from: ${resourceGuidePath}`);
   const fileContent = fs.readFileSync(resourceGuidePath, 'utf-8');
   resourceGuide = JSON.parse(fileContent);
@@ -99,7 +99,6 @@ const needExtractionPrompt = ChatPromptTemplate.fromTemplate(`
 const conversationPrompt = ChatPromptTemplate.fromTemplate(`
   You are a compassionate, bilingual community assistant representing the Hispanic Alliance of South Carolina.
   Your name is Maria.
-  IMPORTANT: Once you've introduced yourself in a conversation, DO NOT reintroduce yourself or use greetings like "Hi there" in follow-up messages. Maintain a natural conversation flow as if you're continuing a single discussion.  If this is NOT the first message in a conversation, skip all introductions and greetings - respond directly to the user's question or comment.
   
   Your job is to help people who are struggling or in need. Many may be dealing with housing issues, legal problems, healthcare challenges, or trying to find education resources.
   

@@ -8,18 +8,20 @@ This project is a Twilio Serverless application that provides an AI-powered SMS 
 - Understand inquiries related to housing, education, healthcare, and more
 - Provide relevant information and resources from a curated knowledge base
 - Escalate complex or unclear requests to human agents when necessary
+- Support bilingual interactions in English and Spanish
 
 By leveraging Twilio Serverless Functions and OpenAI's language models through LangChain, the assistant enhances accessibility and responsiveness for community support services.
 
 ## �� Table of Contents
-	•	Features
-	•	Tech Stack
-	•	Getting Started
-	•	Usage
-	•	Project Structure
-	•	Contributing
-	•	License
-	•	Acknowledgments
+- Features
+- Tech Stack
+- Project Structure
+- Getting Started
+- Usage
+- Training the AI Assistant
+- Contributing
+- License
+- Acknowledgments
 
 ## ✨ Features
 
@@ -36,6 +38,45 @@ By leveraging Twilio Serverless Functions and OpenAI's language models through L
 - **AI Integration**: LangChain with OpenAI GPT-4
 - **SMS Integration**: Twilio Serverless Functions
 - **Development Tools**: Cursor (AI-enhanced IDE), ngrok for local testing
+
+## 📁 Project Structure
+
+```
+HA_RFA_Agent/
+├── src/                          # All source code
+│   ├── functions/                # Twilio Serverless Functions
+│   │   ├── channels/            # Channel-specific handlers
+│   │   └── tools/              # Utility functions
+│   ├── resources/               # Resource management
+│   │   ├── matchers/           # Resource matching algorithms
+│   │   └── processors/         # Resource data processors
+│   ├── ai/                      # AI-related code
+│   │   ├── prompts/            # LLM prompts
+│   │   ├── models/             # Model definitions
+│   │   └── finetuning/         # Fine-tuning scripts
+│   └── utils/                   # Shared utilities
+├── assets/                      # Static assets and frontend
+│   ├── images/                  # Image assets
+│   ├── js/                      # Frontend JavaScript
+│   └── css/                     # Stylesheets
+├── data/                        # Data files
+│   ├── resources/              # Resource data files
+│   ├── training/               # Training data
+│   └── raw/                    # Raw data files
+├── docs/                        # Documentation
+│   ├── api/                    # API documentation
+│   ├── development/            # Developer guides
+│   └── user/                   # User documentation
+├── tests/                       # Testing
+│   ├── unit/                   # Unit tests
+│   ├── integration/            # Integration tests
+│   └── fixtures/               # Test fixtures
+├── scripts/                     # Utility scripts
+│   ├── deployment/             # Deployment scripts
+│   └── data/                   # Data processing scripts
+├── config/                      # Configuration files
+└── node_modules/                # Dependencies
+```
 
 ## 🚀 Getting Started
 
@@ -59,7 +100,12 @@ By leveraging Twilio Serverless Functions and OpenAI's language models through L
    ```
 
 3. **Configure Environment Variables**
-   Create a `.env` file in the root directory and add your credentials:
+   Copy the example environment file and add your credentials:
+   ```bash
+   cp config/.env.example config/.env
+   ```
+   
+   Edit the `.env` file with your credentials:
    ```
    OPENAI_API_KEY=your_openai_api_key
    TWILIO_ACCOUNT_SID=your_twilio_account_sid
@@ -91,45 +137,19 @@ Once the application is running and ngrok is set up:
    - Send an SMS to your Twilio phone number
    - The AI assistant will process the message and respond accordingly
 
-## 📁 Project Structure
+For more detailed usage instructions, see the [user documentation](docs/user/).
 
-```
-ha-request-line-assistant/
-├── functions/                # Twilio Serverless Functions
-│   ├── channels/            # Channel-specific handlers
-│   │   ├── messaging/      # SMS message handling
-│   │   ├── voice/         # Voice call handling
-│   │   └── conversations/ # Chat handling
-│   └── tools/              # Utility functions
-├── assets/                  # Static assets
-├── package.json            # Node.js dependencies
-├── tsconfig.json           # TypeScript configuration
-├── .env                    # Environment variables
-└── README.md              # Project documentation
-```
+## 🧠 Training the AI Assistant
+
+For detailed instructions on training and fine-tuning the assistant, see [docs/development/TRAINING.md](docs/development/TRAINING.md).
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. **Fork the Repository**
-2. **Create a New Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit Your Changes**
-   ```bash
-   git commit -m "Add your message here"
-   ```
-4. **Push to Your Fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. **Submit a Pull Request**
+Contributions are welcome! Please see [CONTRIBUTING.md](docs/development/CONTRIBUTING.md) for details.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See [LICENSE](docs/LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
@@ -138,5 +158,3 @@ This project is licensed under the MIT License.
 - OpenAI
 - LangChain
 - Cursor
-
-Feel free to customize this template further to match your project's specifics. Let me know if you need assistance with any section!
