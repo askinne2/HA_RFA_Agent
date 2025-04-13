@@ -8,12 +8,26 @@ const {
   readConversationAttributes,
 } = require(Runtime.getAssets()["/utils.js"].path);
 
-// Import the existing functionality
-const { OpenAI } = require('@langchain/openai');
-const { ChatPromptTemplate } = require('@langchain/core/prompts');
+// Import AI services
+const { 
+  detectIntent, 
+  detectLanguage, 
+  extractLocation, 
+  extractNeed 
+} = require('../../../ai/services/detection');
+
+const { 
+  generateConversationResponse, 
+  getResponseTemplate, 
+  getSuggestions 
+} = require('../../../ai/services/conversation');
+
+const {
+  findMatchingResources,
+  formatResourceResponse
+} = require('../../../ai/services/resources');
+
 const { StringOutputParser } = require('@langchain/core/output_parsers');
-const fs = require('fs');
-const path = require('path');
 
 // Load the enhanced resource guide
 let resourceGuide;
@@ -210,24 +224,14 @@ exports.handler = async function (context, event, callback) {
         }
         
         // Detect language first - ALWAYS detect from the current message
-        const languageChain = languageDetectionPrompt.pipe(openai).pipe(new StringOutputParser());
-        let language = await languageChain.invoke({ message: Body });
-        language = language.trim().toLowerCase();
-        
-        if (language !== 'en' && language !== 'es') {
-          console.log(`Invalid language detected: "${language}", defaulting to "en"`);
-          language = 'en';
-        }
+        let language = await detectLanguage(Body);
         
         // Override stored language with fresh detection for each message
         userState.data.language = language;
         console.log(`Detected language: ${language}`);
         
         // Process the message using the intent detection pipeline
-        const intentChain = intentDetectionPrompt.pipe(openai).pipe(new StringOutputParser());
-        let intent = await intentChain.invoke({ message: Body });
-        intent = intent.trim().toLowerCase();
-        
+        let intent = await detectIntent(Body);
         console.log(`Detected intent: ${intent}`);
         
         // For simplicity, we'll send a response based on intent
@@ -237,15 +241,10 @@ exports.handler = async function (context, event, callback) {
         if ((intent === 'resource_request' || intent === 'category') && 
             (Body.toLowerCase().includes('resource') || Body.toLowerCase().includes('help with') || 
              Body.toLowerCase().includes('need help') || Body.toLowerCase().includes('looking for help'))) {
-          // Use existing resource matching logic
-          // Try to extract needed information
-          const locationChain = locationExtractionPrompt.pipe(openai).pipe(new StringOutputParser());
-          let zipcode = await locationChain.invoke({ message: Body });
-          zipcode = zipcode.trim();
           
-          const needChain = needExtractionPrompt.pipe(openai).pipe(new StringOutputParser());
-          let category = await needChain.invoke({ message: Body });
-          category = category.trim();
+          // Try to extract needed information
+          let zipcode = await extractLocation(Body);
+          let category = await extractNeed(Body);
           
           console.log(`Extracted info - Zipcode: ${zipcode}, Category: ${category}`);
           
@@ -258,7 +257,7 @@ exports.handler = async function (context, event, callback) {
             console.log(`Searching for resources - Category: ${userState.data.category}, Zipcode: ${userState.data.zipcode}`);
             
             // Find matching resources using direct resource matching
-            const matches = findResourcesDirectly({
+            const matches = findMatchingResources({
               language: language,
               zipcode: userState.data.zipcode,
               category: userState.data.category
@@ -268,12 +267,11 @@ exports.handler = async function (context, event, callback) {
             userState.state = 'resources_provided';
           } else {
             // Use conversational AI instead of templates for asking for missing info
-            const conversationChain = conversationPrompt.pipe(openai).pipe(new StringOutputParser());
             const state = userState.state;
             const zipcode = userState.data.zipcode || 'unknown';
             const category = userState.data.category || 'unknown';
             
-            responseMessage = await conversationChain.invoke({ 
+            responseMessage = await generateConversationResponse({ 
               language, 
               state, 
               zipcode, 
@@ -289,9 +287,7 @@ exports.handler = async function (context, event, callback) {
           }
         } else if (intent === 'location') {
           // Special handling for explicit location mentions
-          const locationChain = locationExtractionPrompt.pipe(openai).pipe(new StringOutputParser());
-          let zipcode = await locationChain.invoke({ message: Body });
-          zipcode = zipcode.trim();
+          let zipcode = await extractLocation(Body);
           
           if (zipcode !== 'none') {
             userState.data.zipcode = zipcode;
@@ -301,11 +297,10 @@ exports.handler = async function (context, event, callback) {
             }
             
             // Use conversational AI for response
-            const conversationChain = conversationPrompt.pipe(openai).pipe(new StringOutputParser());
             const state = userState.state;
             const category = userState.data.category || 'unknown';
             
-            responseMessage = await conversationChain.invoke({ 
+            responseMessage = await generateConversationResponse({ 
               language, 
               state, 
               zipcode, 
@@ -314,12 +309,11 @@ exports.handler = async function (context, event, callback) {
             });
           } else {
             // Use conversational AI for response
-            const conversationChain = conversationPrompt.pipe(openai).pipe(new StringOutputParser());
             const state = userState.state;
             const zipcode = userState.data.zipcode || 'unknown';
             const category = userState.data.category || 'unknown';
             
-            responseMessage = await conversationChain.invoke({ 
+            responseMessage = await generateConversationResponse({ 
               language, 
               state, 
               zipcode, 
@@ -329,12 +323,11 @@ exports.handler = async function (context, event, callback) {
           }
         } else {
           // For all other intents, use conversational AI
-          const conversationChain = conversationPrompt.pipe(openai).pipe(new StringOutputParser());
           const state = userState.state;
           const zipcode = userState.data.zipcode || 'unknown';
           const category = userState.data.category || 'unknown';
           
-          responseMessage = await conversationChain.invoke({ 
+          responseMessage = await generateConversationResponse({ 
             language, 
             state, 
             zipcode, 
